@@ -36,13 +36,20 @@ def create_app(config_class=Config):
     from routes.bandwidth import bandwidth_bp
     
     app.register_blueprint(auth_bp)
-    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
     app.register_blueprint(clients_bp)
     app.register_blueprint(billing_bp)
     app.register_blueprint(payments_bp)
     app.register_blueprint(receipts_bp)
     app.register_blueprint(client_portal_bp)
     app.register_blueprint(bandwidth_bp)
+    
+    # Add root route redirect
+    @app.route('/')
+    def index():
+        """Redirect root URL to login page"""
+        from flask import redirect, url_for
+        return redirect(url_for('auth.login'))
     
     # Add middleware to prevent clients from accessing admin routes
     @app.before_request
@@ -91,6 +98,8 @@ def create_app(config_class=Config):
     
     return app
 
+# Create app instance for production servers (gunicorn, etc.)
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True, host='0.0.0.0', port=5000)

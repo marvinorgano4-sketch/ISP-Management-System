@@ -28,6 +28,24 @@ class AuthService:
         if not username or not password:
             return None
         
+        # Check if any users exist in the database
+        user_count = User.query.count()
+        if user_count == 0:
+            # No users exist - create default admin user
+            try:
+                admin = User(
+                    username='admin',
+                    full_name='Administrator',
+                    role='admin'
+                )
+                admin.set_password('admin123')
+                db.session.add(admin)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                # If creation fails, continue with authentication attempt
+                pass
+        
         # Only query User model - client credentials will not work
         user = User.query.filter_by(username=username).first()
         

@@ -52,6 +52,30 @@ def create_app(config_class=Config):
         from flask import redirect, url_for
         return redirect(url_for('auth.login'))
     
+    # Add database initialization endpoint (for debugging)
+    @app.route('/init-db')
+    def init_database():
+        """Initialize database - for debugging only"""
+        try:
+            db.create_all()
+            
+            # Check if admin exists
+            admin = User.query.filter_by(username='admin').first()
+            if not admin:
+                admin = User(
+                    username='admin',
+                    full_name='Administrator',
+                    role='admin'
+                )
+                admin.set_password('admin123')
+                db.session.add(admin)
+                db.session.commit()
+                return "Database initialized! Admin user created (username: admin, password: admin123)"
+            else:
+                return "Database already initialized. Admin user exists."
+        except Exception as e:
+            return f"Error initializing database: {str(e)}"
+    
     # Add middleware to prevent clients from accessing admin routes
     @app.before_request
     def check_client_access_to_admin_routes():

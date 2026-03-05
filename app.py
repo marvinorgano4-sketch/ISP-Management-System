@@ -64,8 +64,7 @@ def create_app(config_class=Config):
             if not admin:
                 admin = User(
                     username='admin',
-                    full_name='Administrator',
-                    role='admin'
+                    full_name='Administrator'
                 )
                 admin.set_password('admin123')
                 db.session.add(admin)
@@ -132,8 +131,7 @@ def create_app(config_class=Config):
             if not admin:
                 admin = User(
                     username='admin',
-                    full_name='Administrator',
-                    role='admin'
+                    full_name='Administrator'
                 )
                 admin.set_password('admin123')
                 db.session.add(admin)

@@ -35,8 +35,7 @@ class AuthService:
             try:
                 admin = User(
                     username='admin',
-                    full_name='Administrator',
-                    role='admin'
+                    full_name='Administrator'
                 )
                 admin.set_password('admin123')
                 db.session.add(admin)

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{% if client %}Edit Client{% else %}New Client{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">
+        {% if client %}Edit Client{% else %}Add New Client{% endif %}
+    </h1>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form method="POST" action="{% if client %}{{ url_for('clients.update_client', client_id=client.id) }}{% else %}{{ url_for('clients.create_client') }}{% endif %}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Full Name *</label>
+                <input type="text" name="full_name" value="{{ client.full_name if client else '' }}" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Address</label>
+                <textarea name="address" rows="2"
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">{{ client.address if client else '' }}</textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Contact Number</label>
+                <input type="text" name="contact_number" value="{{ client.contact_number if client else '' }}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Email</label>
+                <input type="email" name="email" value="{{ client.email if client else '' }}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">PPPoE Username *</label>
+                <input type="text" name="pppoe_username" value="{{ client.pppoe_username if client else '' }}" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            {% if not client %}
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">PPPoE Password *</label>
+                <input type="password" name="pppoe_password" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <p class="text-sm text-gray-500 mt-1">This password will be used for Mikrotik PPPoE connection.</p>
+            </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Mikrotik Profile (Bandwidth Limit) *</label>
+                <select name="mikrotik_profile" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    {% if profiles %}
+                        {% for profile in profiles %}
+                        <option value="{{ profile.name }}" {% if client and client.mikrotik_profile == profile.name %}selected{% endif %}>
+                            {{ profile.name }}
+                            {% if profile.rate_limit %}
+                                - {{ profile.rate_limit }}
+                            {% endif %}
+                        </option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="default" {% if client and client.mikrotik_profile == 'default' %}selected{% endif %}>default</option>
+                    {% endif %}
+                </select>
+                <p class="text-sm text-gray-500 mt-1">Select the bandwidth limit profile from Mikrotik (e.g., 5MBPS, 10MBPS, 15MBPS).</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Plan Name *</label>
+                <input type="text" name="plan_name" value="{{ client.plan_name if client else '' }}" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Plan Amount *</label>
+                <input type="number" name="plan_amount" value="{{ client.plan_amount if client else '' }}" step="0.01" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-2">Status</label>
+                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="active" {% if client and client.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if client and client.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    <option value="suspended" {% if client and client.status == 'suspended' %}selected{% endif %}>Suspended</option>
+                </select>
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                    {% if client %}Update{% else %}Add{% endif %}
+                </button>
+                <a href="{{ url_for('clients.list_clients') }}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

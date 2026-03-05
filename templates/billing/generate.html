@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Bills{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-xl">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Generate Monthly Bills</h1>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form method="POST" action="{{ url_for('billing.generate_bills') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Billing Month *</label>
+                <select name="month" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">Select month...</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-2">Billing Year *</label>
+                <input type="number" name="year" value="{{ now.year }}" min="2000" max="2100" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                <p class="text-sm text-yellow-800">
+                    <strong>Note:</strong> Mag-generate ng bills para sa lahat ng active clients para sa selected month at year.
+                </p>
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                    Generate Bills
+                </button>
+                <a href="{{ url_for('billing.list_bills') }}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium text-center">
+                    Kanselahin
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

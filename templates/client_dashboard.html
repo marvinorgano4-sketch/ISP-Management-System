@@ -1,0 +1,357 @@
+{% extends "client_base.html" %}
+
+{% block title %}Dashboard - ANDODNAK ISP{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        height: 100%;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-card .icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-card .label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-card .value {
+        color: #1f2937;
+        font-size: 1.875rem;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-card .description {
+        color: #9ca3af;
+        font-size: 0.75rem;
+    }
+    
+    .icon-blue {
+        background-color: #dbeafe;
+        color: #2563eb;
+    }
+    
+    .icon-green {
+        background-color: #d1fae5;
+        color: #059669;
+    }
+    
+    .icon-red {
+        background-color: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .icon-purple {
+        background-color: #e9d5ff;
+        color: #9333ea;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .status-online {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-offline {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .status-unknown {
+        background-color: #e5e7eb;
+        color: #374151;
+    }
+    
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-online .status-dot {
+        background-color: #059669;
+    }
+    
+    .status-offline .status-dot {
+        background-color: #dc2626;
+    }
+    
+    .status-unknown .status-dot {
+        background-color: #6b7280;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .action-btn {
+        flex: 1;
+        min-width: 200px;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    
+    .action-btn-primary {
+        background-color: #2563eb;
+        color: white;
+    }
+    
+    .action-btn-primary:hover {
+        background-color: #1d4ed8;
+        color: white;
+    }
+    
+    .action-btn-secondary {
+        background-color: #f3f4f6;
+        color: #374151;
+    }
+    
+    .action-btn-secondary:hover {
+        background-color: #e5e7eb;
+        color: #1f2937;
+    }
+    
+    @media (max-width: 767.98px) {
+        .stat-card {
+            padding: 1.25rem;
+        }
+        
+        .stat-card .value {
+            font-size: 1.5rem;
+        }
+        
+        .action-btn {
+            min-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h3 mb-1">Maligayang pagdating, {{ dashboard_data.client.full_name }}!</h1>
+    <p class="text-muted">Account: {{ dashboard_data.client.pppoe_username }}</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <!-- Remaining Days -->
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="stat-card">
+            <div class="icon icon-blue">
+                <span>📅</span>
+            </div>
+            <div class="label">Natitirang Araw</div>
+            <div class="value">{{ dashboard_data.remaining_days }}</div>
+            <div class="description">Hanggang sa susunod na bayad</div>
+        </div>
+    </div>
+    
+    <!-- Unpaid Balance -->
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="stat-card">
+            <div class="icon {% if dashboard_data.unpaid_balance > 0 %}icon-red{% else %}icon-green{% endif %}">
+                <span>₱</span>
+            </div>
+            <div class="label">Hindi Bayad na Balanse</div>
+            <div class="value">₱{{ "%.2f"|format(dashboard_data.unpaid_balance) }}</div>
+            <div class="description">
+                {% if dashboard_data.unpaid_balance > 0 %}
+                    Kailangan ng bayad
+                {% else %}
+                    Bayad na lahat!
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Connection Status -->
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="stat-card">
+            <div class="icon {% if dashboard_data.connection_status.online %}icon-green{% else %}icon-red{% endif %}">
+                <span>🌐</span>
+            </div>
+            <div class="label">Status ng Koneksyon</div>
+            <div class="value" style="font-size: 1.25rem;">
+                {% if dashboard_data.connection_status.online %}
+                    <span class="status-badge status-online">
+                        <span class="status-dot"></span>
+                        Online
+                    </span>
+                {% elif dashboard_data.connection_status.online == False %}
+                    <span class="status-badge status-offline">
+                        <span class="status-dot"></span>
+                        Offline
+                    </span>
+                {% else %}
+                    <span class="status-badge status-unknown">
+                        <span class="status-dot"></span>
+                        Hindi Alam
+                    </span>
+                {% endif %}
+            </div>
+            <div class="description">
+                {% if dashboard_data.connection_status.online and dashboard_data.connection_status.uptime %}
+                    Uptime: {{ dashboard_data.connection_status.uptime }}
+                {% elif dashboard_data.connection_status.online and dashboard_data.connection_status.address %}
+                    IP: {{ dashboard_data.connection_status.address }}
+                {% else %}
+                    Kasalukuyang status
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Plan Details -->
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="stat-card">
+            <div class="icon icon-purple">
+                <span>📦</span>
+            </div>
+            <div class="label">Kasalukuyang Plan</div>
+            <div class="value" style="font-size: 1.25rem;">{{ dashboard_data.client.plan_name }}</div>
+            <div class="description">₱{{ "%.2f"|format(dashboard_data.client.plan_amount) }}/buwan</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="mb-4">
+    <h2 class="section-title">Mabilis na Aksyon</h2>
+    <div class="action-buttons">
+        <a href="{{ url_for('client_portal.bills') }}" class="action-btn action-btn-primary">
+            📄 Tingnan ang mga Bill
+        </a>
+        <a href="{{ url_for('client_portal.payments') }}" class="action-btn action-btn-secondary">
+            💳 Tingnan ang mga Bayad
+        </a>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+{% if dashboard_data.recent_bills or dashboard_data.recent_payments %}
+<div class="row g-4">
+    <!-- Recent Bills -->
+    {% if dashboard_data.recent_bills %}
+    <div class="col-12 col-lg-6">
+        <div class="stat-card">
+            <h3 class="section-title">Kamakailang mga Bill</h3>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Panahon</th>
+                            <th>Halaga</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bill in dashboard_data.recent_bills %}
+                        <tr>
+                            <td>{{ bill.billing_period }}</td>
+                            <td>₱{{ "%.2f"|format(bill.amount) }}</td>
+                            <td>
+                                {% if bill.status == 'paid' %}
+                                    <span class="badge bg-success">Bayad</span>
+                                {% elif bill.status == 'overdue' %}
+                                    <span class="badge bg-danger">Lampas</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Hindi Bayad</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <a href="{{ url_for('client_portal.bills') }}" class="btn btn-sm btn-outline-primary mt-2">Tingnan Lahat ng Bill</a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Recent Payments -->
+    {% if dashboard_data.recent_payments %}
+    <div class="col-12 col-lg-6">
+        <div class="stat-card">
+            <h3 class="section-title">Kamakailang mga Bayad</h3>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Petsa</th>
+                            <th>Halaga</th>
+                            <th>Paraan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in dashboard_data.recent_payments %}
+                        <tr>
+                            <td>{{ payment.payment_date.strftime('%Y-%m-%d') }}</td>
+                            <td>₱{{ "%.2f"|format(payment.amount) }}</td>
+                            <td>{{ payment.payment_method }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <a href="{{ url_for('client_portal.payments') }}" class="btn btn-sm btn-outline-primary mt-2">Tingnan Lahat ng Bayad</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,383 @@
+{% extends "client_base.html" %}
+
+{% block title %}Bills - ANDODNAK ISP{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        background-color: white;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .filter-btn:hover {
+        background-color: #f3f4f6;
+    }
+    
+    .filter-btn.active {
+        background-color: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
+    
+    .bills-container {
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .bill-card {
+        padding: 1.25rem;
+        border-bottom: 1px solid #e5e7eb;
+        transition: background-color 0.2s;
+    }
+    
+    .bill-card:last-child {
+        border-bottom: none;
+    }
+    
+    .bill-card:hover {
+        background-color: #f9fafb;
+    }
+    
+    .bill-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .bill-period {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .bill-amount {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #2563eb;
+    }
+    
+    .bill-details {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .bill-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .bill-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-pay {
+        background-color: #059669;
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: background-color 0.2s;
+        border: none;
+    }
+    
+    .btn-pay:hover {
+        background-color: #047857;
+        color: white;
+    }
+    
+    .btn-view {
+        background-color: #f3f4f6;
+        color: #374151;
+        padding: 0.5rem 1.25rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: background-color 0.2s;
+    }
+    
+    .btn-view:hover {
+        background-color: #e5e7eb;
+        color: #1f2937;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-paid {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-unpaid {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-overdue {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6b7280;
+    }
+    
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Desktop table view */
+    @media (min-width: 768px) {
+        .bills-table {
+            width: 100%;
+        }
+        
+        .bills-table thead {
+            background-color: #f9fafb;
+        }
+        
+        .bills-table th {
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .bills-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .bills-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .bills-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+    }
+    
+    /* Mobile card view */
+    @media (max-width: 767.98px) {
+        .bills-table {
+            display: none;
+        }
+        
+        .bill-card {
+            display: block;
+        }
+    }
+    
+    /* Hide cards on desktop */
+    @media (min-width: 768px) {
+        .bill-card {
+            display: none;
+        }
+        
+        .bills-table {
+            display: table;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Aking mga Bill</h1>
+    <p class="text-muted">Tingnan at bayaran ang iyong mga billing record</p>
+</div>
+
+<!-- Filter Buttons -->
+<div class="filter-buttons">
+    <button class="filter-btn active" data-filter="all">Lahat ng Bill</button>
+    <button class="filter-btn" data-filter="unpaid">Hindi Bayad</button>
+    <button class="filter-btn" data-filter="paid">Bayad</button>
+    <button class="filter-btn" data-filter="overdue">Lampas</button>
+</div>
+
+<!-- Bills Container -->
+<div class="bills-container">
+    {% if bills %}
+        <!-- Desktop Table View -->
+        <table class="bills-table">
+            <thead>
+                <tr>
+                    <th>Panahon ng Billing</th>
+                    <th>Halaga</th>
+                    <th>Petsa ng Deadline</th>
+                    <th>Status</th>
+                    <th>Aksyon</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bill in bills %}
+                <tr data-status="{{ bill.status }}">
+                    <td>
+                        <strong>{{ bill.billing_period }}</strong>
+                    </td>
+                    <td>
+                        <strong class="text-primary">₱{{ "%.2f"|format(bill.amount) }}</strong>
+                    </td>
+                    <td>{{ bill.due_date.strftime('%B %d, %Y') }}</td>
+                    <td>
+                        {% if bill.status == 'paid' %}
+                            <span class="status-badge status-paid">Bayad</span>
+                        {% elif bill.status == 'overdue' %}
+                            <span class="status-badge status-overdue">Lampas</span>
+                        {% else %}
+                            <span class="status-badge status-unpaid">Hindi Bayad</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            {% if bill.status in ['unpaid', 'overdue'] %}
+                                <a href="{{ url_for('client_portal.pay_bill', billing_id=bill.id) }}" class="btn-pay">
+                                    Bayaran Ngayon
+                                </a>
+                            {% endif %}
+                            <a href="{{ url_for('client_portal.bill_detail', billing_id=bill.id) }}" class="btn-view">
+                                Tingnan
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Mobile Card View -->
+        {% for bill in bills %}
+        <div class="bill-card" data-status="{{ bill.status }}">
+            <div class="bill-header">
+                <div>
+                    <div class="bill-period">{{ bill.billing_period }}</div>
+                    <div class="bill-amount">₱{{ "%.2f"|format(bill.amount) }}</div>
+                </div>
+                <div>
+                    {% if bill.status == 'paid' %}
+                        <span class="status-badge status-paid">Paid</span>
+                    {% elif bill.status == 'overdue' %}
+                        <span class="status-badge status-overdue">Overdue</span>
+                    {% else %}
+                        <span class="status-badge status-unpaid">Unpaid</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="bill-details">
+                <div class="bill-detail-item">
+                    <span>📅</span>
+                    <span>Due: {{ bill.due_date.strftime('%b %d, %Y') }}</span>
+                </div>
+            </div>
+            
+            <div class="bill-actions">
+                {% if bill.status in ['unpaid', 'overdue'] %}
+                    <a href="{{ url_for('client_portal.pay_bill', billing_id=bill.id) }}" class="btn-pay">
+                        Bayaran Ngayon
+                    </a>
+                {% endif %}
+                <a href="{{ url_for('client_portal.bill_detail', billing_id=bill.id) }}" class="btn-view">
+                    Tingnan ang Detalye
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📄</div>
+            <h3>Walang Nahanap na Bill</h3>
+            <p>Wala ka pang billing record.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const billRows = document.querySelectorAll('tr[data-status]');
+        const billCards = document.querySelectorAll('.bill-card[data-status]');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active button
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                
+                // Filter table rows
+                billRows.forEach(row => {
+                    if (filter === 'all' || row.dataset.status === filter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Filter cards
+                billCards.forEach(card => {
+                    if (filter === 'all' || card.dataset.status === filter) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

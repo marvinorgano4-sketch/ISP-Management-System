@@ -1,0 +1,18 @@
+2026-03-05 20:16:16 - INFO - Initializing SQLite connection: instance/isp_billing.db
+2026-03-05 20:16:16 - INFO - SQLite connection established. Found 6 tables: alembic_version, billings, clients, payments, receipts, users
+2026-03-05 20:16:16 - INFO - Initializing Firebase Firestore connection
+2026-03-05 20:16:16 - ERROR - Failed to initialize Firebase: Firebase credentials file not found at: firebase-credentials.json
+Please ensure the file exists and FIREBASE_CREDENTIALS_PATH environment variable is set correctly.
+Traceback (most recent call last):
+  File "C:\Users\REYMARK\Desktop\ISP_Management_System\migrate_to_firebase.py", line 277, in _initialize_firebase
+    self.firestore_db = initialize_firebase()
+                        ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\REYMARK\Desktop\ISP_Management_System\firebase_config.py", line 54, in initialize_firebase
+    raise FileNotFoundError(error_msg)
+FileNotFoundError: Firebase credentials file not found at: firebase-credentials.json
+Please ensure the file exists and FIREBASE_CREDENTIALS_PATH environment variable is set correctly.
+2026-03-05 20:20:32 - INFO - Initializing SQLite connection: instance/isp_billing.db
+2026-03-05 20:20:32 - INFO - SQLite connection established. Found 6 tables: alembic_version, billings, clients, payments, receipts, users
+2026-03-05 20:20:32 - INFO - Initializing Firebase Firestore connection
+2026-03-05 20:20:36 - INFO - Firebase connection established. Found 0 existing collections
+2026-03-05 20:20:39 - INFO - SQLite connection closed

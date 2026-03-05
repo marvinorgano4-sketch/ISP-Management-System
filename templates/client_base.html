@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ANDODNAK ISP - Client Portal{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #64748b;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+        
+        .navbar-brand small {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: normal;
+            opacity: 0.9;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: rgba(255, 255, 255, 1) !important;
+        }
+        
+        .nav-link.active {
+            font-weight: bold;
+            border-bottom: 2px solid white;
+        }
+        
+        main {
+            flex: 1;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        
+        footer {
+            background-color: #1f2937;
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+        
+        footer p {
+            margin: 0;
+        }
+        
+        footer .text-muted {
+            color: #9ca3af !important;
+        }
+        
+        .alert {
+            border-radius: 0.5rem;
+        }
+        
+        @media (max-width: 767.98px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
+            
+            .navbar-brand small {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-md navbar-dark">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('client_portal.dashboard') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" 
+                     alt="ANDODNAK ISP Logo" 
+                     height="40" 
+                     class="me-2"
+                     onerror="this.style.display='none';">
+                <div>
+                    ANDODNAK ISP
+                    <small>Network and Data Solution</small>
+                </div>
+            </a>
+            
+            <!-- Mobile Menu Toggle -->
+            <button class="navbar-toggler" 
+                    type="button" 
+                    data-bs-toggle="collapse" 
+                    data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" 
+                    aria-expanded="false" 
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'client_portal.dashboard' %}active{% endif %}" 
+                           href="{{ url_for('client_portal.dashboard') }}">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('client_portal.bills') %}active{% endif %}" 
+                           href="{{ url_for('client_portal.bills') }}">
+                            Bills
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('client_portal.payments') %}active{% endif %}" 
+                           href="{{ url_for('client_portal.payments') }}">
+                            Payments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('client_portal.logout') }}">
+                            Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="text-center">
+        <div class="container">
+            <p>&copy; 2024 ANDODNAK ISP. All rights reserved.</p>
+            <p class="text-muted small mt-1">Developer: Marvin Organo</p>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

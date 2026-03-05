@@ -1,0 +1,22 @@
+LOGO SETUP INSTRUCTIONS
+========================
+
+I-save ang AZADOOE ETN logo dito:
+- Filename: logo.png
+- Location: static/images/logo.png
+- Recommended size: 400x150 pixels (or similar ratio)
+- Format: PNG with transparent background (recommended)
+
+Steps:
+1. Save the AZADOOE ETN logo image as "logo.png"
+2. Copy it to this folder: static/images/
+3. Refresh the browser to see the logo
+
+The logo will appear on:
+- Login page (centered at top)
+- Dashboard and all pages (top left in navigation bar)
+
+Current branding:
+- Company Name: ANDODNAK ISP
+- Tagline: Network and Data Solution
+- Developer: Marvin Organo

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial; width: 300px; margin: auto; padding: 10px; }
+        .receipt-card { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        .btn-print { background: #f1c40f; padding: 10px; width: 100%; border: none; cursor: pointer; margin-top: 10px; }
+        @media print { .btn-print { display: none; } } /* Mawawala ang button pag nag-print na */
+    </style>
+</head>
+<body>
+    <div class="receipt-card">
+        <h3>L SECURITY ISP BILLING</h3>
+        <p>-------------------------</p>
+        <p>Client: <b>Juan Dela Cruz</b></p>
+        <p>Amount: <b>P1,500.00</b></p>
+        <p>Date: 2026-03-05</p>
+        <p>Status: PAID</p>
+        <p>-------------------------</p>
+        <p>Salamat sa pagtitiwala!</p>
+        
+        <button class="btn-print" onclick="window.print()">PRINT RECEIPT</button>
+    </div>
+</body>
+</html>

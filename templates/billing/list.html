@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Billing Records{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Billing Records</h1>
+        <a href="{{ url_for('billing.generate_form') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+            Generate Bills
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form method="GET" action="{{ url_for('billing.list_bills') }}" class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[200px]">
+                <input type="text" name="client_name" value="{{ client_name }}" 
+                       placeholder="Client name..." 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="min-w-[120px]">
+                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Status</option>
+                    <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Paid</option>
+                    <option value="unpaid" {% if status_filter == 'unpaid' %}selected{% endif %}>Unpaid</option>
+                    <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>Overdue</option>
+                </select>
+            </div>
+            <div class="min-w-[100px]">
+                <input type="number" name="month" value="{{ month_filter }}" placeholder="Month" min="1" max="12"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="min-w-[100px]">
+                <input type="number" name="year" value="{{ year_filter }}" placeholder="Year"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button type="submit" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg">
+                Filter
+            </button>
+        </form>
+    </div>
+
+    <!-- Bills Table -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for bill in bills %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="{{ url_for('clients.view_client', client_id=bill.client.id) }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                            {{ bill.client.full_name }}
+                        </a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ bill.billing_month }}/{{ bill.billing_year }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">₱{{ "%.2f"|format(bill.amount) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ bill.due_date.strftime('%Y-%m-%d') }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                   {% if bill.status == 'paid' %}bg-green-100 text-green-800
+                                   {% elif bill.status == 'overdue' %}bg-red-100 text-red-800
+                                   {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                            {{ bill.status }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        {% if bill.status != 'paid' %}
+                        <a href="{{ url_for('payments.new_payment', billing_id=bill.id) }}" class="text-blue-600 hover:text-blue-900 mr-3">Pay</a>
+                        {% endif %}
+                        <a href="{{ url_for('billing.view_bill', billing_id=bill.id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">Walang billing records.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

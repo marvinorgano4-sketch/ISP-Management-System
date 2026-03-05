@@ -1,0 +1,367 @@
+{% extends "client_base.html" %}
+
+{% block title %}Bill Detail - ANDODNAK ISP{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .back-link {
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .back-link:hover {
+        color: #374151;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .bill-container {
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+    }
+    
+    .bill-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .bill-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .bill-subtitle {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .bill-amount-large {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #2563eb;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-top: 0.5rem;
+    }
+    
+    .status-paid {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-unpaid {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-overdue {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .detail-section {
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .detail-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .charges-table {
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .charges-table th {
+        text-align: left;
+        padding: 0.75rem;
+        background-color: #f9fafb;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .charges-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .charges-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .total-row {
+        font-weight: bold;
+        background-color: #f9fafb;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #e5e7eb;
+    }
+    
+    .btn-pay {
+        background-color: #059669;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.2s;
+        border: none;
+        font-size: 1rem;
+    }
+    
+    .btn-pay:hover {
+        background-color: #047857;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background-color: #f3f4f6;
+        color: #374151;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.2s;
+        font-size: 1rem;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #e5e7eb;
+        color: #1f2937;
+    }
+    
+    @media (max-width: 767.98px) {
+        .bill-container {
+            padding: 1.5rem;
+        }
+        
+        .bill-header {
+            flex-direction: column;
+        }
+        
+        .bill-amount-large {
+            font-size: 1.5rem;
+        }
+        
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .charges-table {
+            font-size: 0.875rem;
+        }
+        
+        .charges-table th,
+        .charges-table td {
+            padding: 0.5rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-pay,
+        .btn-secondary {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <a href="{{ url_for('client_portal.bills') }}" class="back-link">
+        ← Bumalik sa mga Bill
+    </a>
+    <h1 class="page-title">Detalye ng Bill</h1>
+</div>
+
+<div class="bill-container">
+    <!-- Bill Header -->
+    <div class="bill-header">
+        <div>
+            <div class="bill-title">{{ bill.billing_period }}</div>
+            <div class="bill-subtitle">Bill #{{ bill.id }}</div>
+            {% if bill.status == 'paid' %}
+                <span class="status-badge status-paid">Bayad</span>
+            {% elif bill.status == 'overdue' %}
+                <span class="status-badge status-overdue">Lampas</span>
+            {% else %}
+                <span class="status-badge status-unpaid">Hindi Bayad</span>
+            {% endif %}
+        </div>
+        <div class="text-end">
+            <div class="detail-label">Kabuuang Halaga</div>
+            <div class="bill-amount-large">₱{{ "%.2f"|format(bill.amount) }}</div>
+        </div>
+    </div>
+    
+    <!-- Bill Information -->
+    <div class="detail-section">
+        <h2 class="section-title">Impormasyon ng Billing</h2>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Panahon ng Billing</div>
+                <div class="detail-value">{{ bill.billing_period }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Petsa ng Deadline</div>
+                <div class="detail-value">{{ bill.due_date.strftime('%B %d, %Y') }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Petsa ng Paglabas</div>
+                <div class="detail-value">{{ bill.created_at.strftime('%B %d, %Y') if bill.created_at else 'N/A' }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Status</div>
+                <div class="detail-value">
+                    {% if bill.status == 'paid' %}
+                        Bayad
+                    {% elif bill.status == 'overdue' %}
+                        Lampas
+                    {% else %}
+                        Hindi Bayad
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charge Breakdown -->
+    <div class="detail-section">
+        <h2 class="section-title">Detalye ng Singil</h2>
+        <div class="table-responsive">
+            <table class="charges-table">
+                <thead>
+                    <tr>
+                        <th>Paglalarawan</th>
+                        <th class="text-end">Halaga</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Buwanang Bayad sa Serbisyo</td>
+                        <td class="text-end">₱{{ "%.2f"|format(bill.amount) }}</td>
+                    </tr>
+                    {% if bill.notes %}
+                    <tr>
+                        <td colspan="2">
+                            <small class="text-muted">Tala: {{ bill.notes }}</small>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td>Kabuuang Halagang Dapat Bayaran</td>
+                        <td class="text-end">₱{{ "%.2f"|format(bill.amount) }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Payment Information (if paid) -->
+    {% if bill.status == 'paid' and bill.payment %}
+    <div class="detail-section">
+        <h2 class="section-title">Impormasyon ng Bayad</h2>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Petsa ng Bayad</div>
+                <div class="detail-value">{{ bill.payment.payment_date.strftime('%B %d, %Y') }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Paraan ng Bayad</div>
+                <div class="detail-value">{{ bill.payment.payment_method }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Reference Number</div>
+                <div class="detail-value">{{ bill.payment.reference_number }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Halagang Binayaran</div>
+                <div class="detail-value">₱{{ "%.2f"|format(bill.payment.amount) }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        {% if bill.status in ['unpaid', 'overdue'] %}
+            <a href="{{ url_for('client_portal.pay_bill', billing_id=bill.id) }}" class="btn-pay">
+                💳 Bayaran Ngayon via GCash
+            </a>
+        {% endif %}
+        <a href="{{ url_for('client_portal.bills') }}" class="btn-secondary">
+            Bumalik sa mga Bill
+        </a>
+    </div>
+</div>
+{% endblock %}

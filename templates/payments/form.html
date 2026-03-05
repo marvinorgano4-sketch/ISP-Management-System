@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Record Payment{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Record Payment</h1>
+
+    {% if billing %}
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <h3 class="font-bold text-blue-800 mb-2">Billing Information</h3>
+        <div class="text-sm text-blue-700">
+            <p><strong>Client:</strong> {{ billing.client.full_name }}</p>
+            <p><strong>Period:</strong> {{ billing.billing_month }}/{{ billing.billing_year }}</p>
+            <p><strong>Amount Due:</strong> ₱{{ "%.2f"|format(billing.amount) }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form method="POST" action="{{ url_for('payments.record_payment') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="billing_id" value="{{ billing.id if billing else '' }}">
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Amount *</label>
+                <input type="number" name="amount" value="{{ billing.amount if billing else '' }}" step="0.01" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Payment Date *</label>
+                <input type="date" name="payment_date" value="{{ now.strftime('%Y-%m-%d') }}" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Payment Method *</label>
+                <select name="payment_method" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">Select method...</option>
+                    <option value="cash">Cash</option>
+                    <option value="gcash">GCash</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Reference Number</label>
+                <input type="text" name="reference_number" 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                       placeholder="Optional - for GCash or bank transfers">
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-2">Notes</label>
+                <textarea name="notes" rows="3"
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          placeholder="Optional notes..."></textarea>
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                    Record Payment
+                </button>
+                <a href="{{ url_for('billing.list_bills') }}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium text-center">
+                    Kanselahin
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

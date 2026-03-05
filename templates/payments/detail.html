@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Details{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Payment Details</h1>
+        <a href="{{ url_for('payments.list_payments') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg">
+            Bumalik
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <span class="text-gray-600 font-medium">Client:</span>
+                <div class="text-gray-800 mt-1">
+                    <a href="{{ url_for('clients.view_client', client_id=payment.client.id) }}" class="text-blue-600 hover:text-blue-800">
+                        {{ payment.client.full_name }}
+                    </a>
+                </div>
+            </div>
+            <div>
+                <span class="text-gray-600 font-medium">Payment Date:</span>
+                <div class="text-gray-800 mt-1">{{ payment.payment_date.strftime('%B %d, %Y') }}</div>
+            </div>
+            <div>
+                <span class="text-gray-600 font-medium">Amount:</span>
+                <div class="text-gray-800 mt-1 text-xl font-bold">₱{{ "%.2f"|format(payment.amount) }}</div>
+            </div>
+            <div>
+                <span class="text-gray-600 font-medium">Payment Method:</span>
+                <div class="text-gray-800 mt-1">{{ payment.payment_method }}</div>
+            </div>
+            {% if payment.reference_number %}
+            <div>
+                <span class="text-gray-600 font-medium">Reference Number:</span>
+                <div class="text-gray-800 mt-1">{{ payment.reference_number }}</div>
+            </div>
+            {% endif %}
+            <div>
+                <span class="text-gray-600 font-medium">Billing Period:</span>
+                <div class="text-gray-800 mt-1">
+                    <a href="{{ url_for('billing.view_bill', billing_id=payment.billing.id) }}" class="text-blue-600 hover:text-blue-800">
+                        {{ payment.billing.billing_month }}/{{ payment.billing.billing_year }}
+                    </a>
+                </div>
+            </div>
+            {% if payment.receipt %}
+            <div>
+                <span class="text-gray-600 font-medium">Receipt:</span>
+                <div class="text-gray-800 mt-1">
+                    <a href="{{ url_for('receipts.view_receipt', receipt_id=payment.receipt.id) }}" class="text-blue-600 hover:text-blue-800">
+                        {{ payment.receipt.receipt_number }}
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            <div>
+                <span class="text-gray-600 font-medium">Recorded At:</span>
+                <div class="text-gray-800 mt-1">{{ payment.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+            </div>
+        </div>
+
+        {% if payment.notes %}
+        <div class="mt-4 pt-4 border-t border-gray-200">
+            <span class="text-gray-600 font-medium">Notes:</span>
+            <div class="text-gray-800 mt-1">{{ payment.notes }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if payment.receipt %}
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+        <h3 class="text-lg font-bold text-green-800 mb-3">Receipt Available</h3>
+        <p class="text-green-700 mb-4">Ang receipt para sa payment na ito ay available na.</p>
+        <a href="{{ url_for('receipts.view_receipt', receipt_id=payment.receipt.id) }}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg inline-block">
+            View Receipt
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

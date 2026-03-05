@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Billing Details{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Billing Details</h1>
+        <a href="{{ url_for('billing.list_bills') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg">
+            Bumalik
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <span class="text-gray-600 font-medium">Client:</span>
+                <div class="text-gray-800 mt-1">
+                    <a href="{{ url_for('clients.view_client', client_id=billing.client.id) }}" class="text-blue-600 hover:text-blue-800">
+                        {{ billing.client.full_name }}
+                    </a>
+                </div>
+            </div>
+            <div>
+                <span class="text-gray-600 font-medium">Billing Period:</span>
+                <div class="text-gray-800 mt-1">{{ billing.billing_month }}/{{ billing.billing_year }}</div>
+            </div>
+            <div>
+                <span class="text-gray-600 font-medium">Amount:</span>
+                <div class="text-gray-800 mt-1 text-xl font-bold">₱{{ "%.2f"|format(billing.amount) }}</div>
+            </div>
+            <div>
+                <span class="text-gray-600 font-medium">Due Date:</span>
+                <div class="text-gray-800 mt-1">{{ billing.due_date.strftime('%B %d, %Y') }}</div>
+            </div>
+            <div>
+                <span class="text-gray-600 font-medium">Status:</span>
+                <div class="mt-1">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                               {% if billing.status == 'paid' %}bg-green-100 text-green-800
+                               {% elif billing.status == 'overdue' %}bg-red-100 text-red-800
+                               {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                        {{ billing.status }}
+                    </span>
+                </div>
+            </div>
+            <div>
+                <span class="text-gray-600 font-medium">Created:</span>
+                <div class="text-gray-800 mt-1">{{ billing.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+            </div>
+            {% if billing.paid_at %}
+            <div>
+                <span class="text-gray-600 font-medium">Paid At:</span>
+                <div class="text-gray-800 mt-1">{{ billing.paid_at.strftime('%Y-%m-%d %H:%M') }}</div>
+            </div>
+            {% endif %}
+            {% if billing.payment %}
+            <div>
+                <span class="text-gray-600 font-medium">Payment:</span>
+                <div class="text-gray-800 mt-1">
+                    <a href="{{ url_for('payments.view_payment', payment_id=billing.payment.id) }}" class="text-blue-600 hover:text-blue-800">
+                        View Payment
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if billing.status != 'paid' %}
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="text-lg font-bold text-blue-800 mb-3">Action Required</h3>
+        <p class="text-blue-700 mb-4">Ang billing record na ito ay hindi pa bayad.</p>
+        <a href="{{ url_for('payments.new_payment', billing_id=billing.id) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg inline-block">
+            Magbayad Ngayon
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

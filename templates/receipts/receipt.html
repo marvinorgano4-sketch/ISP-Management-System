@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Receipt - {{ receipt.receipt_number }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-center">
+        <div class="w-full max-w-sm">
+            <!-- Print Button (hidden when printing) -->
+            <div class="mb-4 print:hidden">
+                <button onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                    🖨️ Print Receipt
+                </button>
+                <a href="{{ url_for('payments.list_payments') }}" class="block w-full bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium text-center mt-2">
+                    Bumalik
+                </a>
+            </div>
+
+            <!-- Receipt (optimized for thermal printer 300px width) -->
+            <div class="bg-white border-2 border-gray-300 p-6 receipt-container" style="width: 300px; margin: 0 auto;">
+                <div class="text-center mb-4">
+                    <h1 class="text-lg font-bold">ANDODNAK ISP</h1>
+                    <p class="text-xs">Network and Data Solution</p>
+                    <div class="border-t-2 border-b-2 border-gray-800 my-2 py-1">
+                        <p class="text-sm font-bold">OFFICIAL RECEIPT</p>
+                    </div>
+                </div>
+
+                <div class="text-sm mb-4">
+                    <div class="mb-2">
+                        <strong>Receipt No:</strong><br>
+                        {{ receipt.receipt_number }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Date:</strong><br>
+                        {{ receipt.payment_date.strftime('%B %d, %Y') }}
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-400 my-3"></div>
+
+                <div class="text-sm mb-4">
+                    <div class="mb-2">
+                        <strong>Client Name:</strong><br>
+                        {{ receipt.client_name }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Amount Paid:</strong><br>
+                        <span class="text-xl font-bold">₱{{ "%.2f"|format(receipt.amount) }}</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Status:</strong><br>
+                        <span class="uppercase font-bold">{{ receipt.status }}</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-400 my-3"></div>
+
+                <div class="text-center text-xs mt-4">
+                    <p class="mb-2">Thank you for your payment!</p>
+                    <p class="text-gray-600">Salamat po sa inyong tiwala.</p>
+                    <p class="text-gray-500 mt-2 text-[10px]">Developer: Marvin Organo</p>
+                </div>
+
+                <div class="border-t-2 border-gray-800 mt-4 pt-2 text-center text-xs">
+                    <p>{{ receipt.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .receipt-container, .receipt-container * {
+        visibility: visible;
+    }
+    .receipt-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 300px;
+    }
+    .print\\:hidden {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}

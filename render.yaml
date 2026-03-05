@@ -8,14 +8,10 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        value: sqlite:////opt/render/project/data/isp_billing.db
+        value: sqlite:///isp_billing.db
       - key: MIKROTIK_HOST
         value: 192.168.10.5
       - key: MIKROTIK_USER
         value: admin
       - key: MIKROTIK_PASSWORD
         sync: false
-    disk:
-      name: isp-data
-      mountPath: /opt/render/project/data
-      sizeGB: 1

@@ -3,6 +3,7 @@ from flask import Flask, session, request, abort
 from config import Config
 from extensions import db, login_manager, migrate, csrf
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +96,27 @@ def create_app(config_class=Config):
         
         # Allow the request if it's not an admin route
         return None
+    
+    # Initialize database on first run
+    with app.app_context():
+        try:
+            # Create all tables
+            db.create_all()
+            
+            # Check if admin user exists, create if not
+            admin = User.query.filter_by(username='admin').first()
+            if not admin:
+                admin = User(
+                    username='admin',
+                    full_name='Administrator',
+                    role='admin'
+                )
+                admin.set_password('admin123')
+                db.session.add(admin)
+                db.session.commit()
+                logger.info("Default admin user created (username: admin, password: admin123)")
+        except Exception as e:
+            logger.error(f"Database initialization error: {e}")
     
     return app
 
